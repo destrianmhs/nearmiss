@@ -66,7 +66,7 @@
                 'w-64': sidebarOpen && !mobileMenu, 
                 'w-20': !sidebarOpen && !mobileMenu,
                 'translate-x-0 w-64': mobileMenu,
-                '–translate-x-full': !mobileMenu
+                '-translate-x-full': !mobileMenu
             }" 
            class="fixed md:relative inset-y-0 left-0 bg-[#0f172a] text-white transition-all duration-300 flex flex-col z-[70] md:translate-x-0">
         
@@ -251,7 +251,6 @@
                     <label class="text-[9px] font-black uppercase text-slate-400 ml-1">Countermeasure</label>
                     <input type="text" x-model="formData.measure" class="w-full px-4 py-2.5 bg-slate-50 rounded-xl border-none text-xs outline-none ring-1 ring-slate-100">
                 </div>
-                <!-- INTEGRASI BARU: INPUT DOKUMENTASI FOTO -->
                 <div class="col-span-2">
                     <label class="text-[9px] font-black uppercase text-slate-400 ml-1">Dokumentasi Foto</label>
                     <div class="mt-1 flex items-center gap-4 p-3 bg-slate-50 rounded-xl ring-1 ring-slate-100">
@@ -357,9 +356,17 @@
                     this.showForm = true;
                 },
 
+                // PERBAIKAN: originalWhen diisi objek Date/String mentah asli langsung agar konversi getEpoch() di GAS akurat
                 editData(item) {
                     this.isEdit = true;
-                    this.formData = { ...item, NIK: item.nik, Nama: item.nama, When: item.when ? new Date(item.when).toISOString().slice(0, 16) : '', originalWhen: item.when, foto: item.foto || '' };
+                    this.formData = { 
+                        ...item, 
+                        NIK: item.nik, 
+                        Nama: item.nama, 
+                        When: item.when ? new Date(item.when).toISOString().slice(0, 16) : '', 
+                        originalWhen: item.when, // Mempertahankan timestamp murni dari database sheet
+                        foto: item.foto || '' 
+                    };
                     this.resetPhotoInput();
                     this.showForm = true;
                 },
@@ -391,7 +398,6 @@
                     this.isSyncing = true;
                     const action = this.isEdit ? 'updateNearmiss' : 'addNearmiss';
                     
-                    // Sisipkan objek payload foto ke dalam struktur data yang dikirim
                     const payloadData = { 
                         ...this.formData,
                         photoBase64: this.photoBase64,
@@ -413,7 +419,10 @@
                     if (!confirm("Hapus laporan ini?")) return;
                     this.isSyncing = true;
                     try {
-                        const r = await fetch(SPREADSHEET_API, { method: 'POST', body: JSON.stringify({ action: 'deleteNearmiss', nik, when }) });
+                        const r = await fetch(SPREADSHEET_API, { 
+                            method: 'POST', 
+                            body: JSON.stringify({ action: 'deleteNearmiss', nik, when }) // 'when' dikirim murni tanpa re-formatting bawaan browser
+                        });
                         const res = await r.json();
                         if (res.status === 'success') await this.loadData();
                     } catch (e) { alert("Gagal hapus"); }
