@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Painting 2W</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden; }
+        .glass-effect { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="bg-[#0f172a] flex items-center justify-center min-h-screen px-4 sm:px-6">
+    
+    <div class="fixed top-0 left-0 w-48 h-48 md:w-64 md:h-64 bg-blue-600 rounded-full filter blur-[100px] opacity-10 -translate-x-1/2 -translate-y-1/2"></div>
+    <div class="fixed bottom-0 right-0 w-64 h-64 md:w-96 md:h-96 bg-indigo-500 rounded-full filter blur-[120px] opacity-10 translate-x-1/2 translate-y-1/2"></div>
+
+    <div class="glass-effect p-8 md:p-10 rounded-[2rem] md:rounded-[3rem] shadow-2xl w-full max-w-[400px] relative z-10 border border-white/20">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4 shadow-lg shadow-blue-500/20">
+                <i data-lucide="shield-check" class="w-8 h-8 text-white"></i>
+            </div>
+            <h2 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight leading-none">NEARMISS</h2>
+            <p class="text-[10px] font-extrabold text-blue-600 uppercase tracking-[0.4em] mt-2">Painting 2W System</p>
+        </div>
+
+        <div class="space-y-4">
+            <div class="relative group">
+                <div class="absolute inset-y-0 left-5 flex items-center text-slate-400 group-focus-within:text-blue-600 transition-colors">
+                    <i data-lucide="user" class="w-5 h-5"></i>
+                </div>
+                <input type="text" id="username" placeholder="Username" 
+                    class="w-full pl-14 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold text-slate-700 transition-all">
+            </div>
+
+            <div class="relative group">
+                <div class="absolute inset-y-0 left-5 flex items-center text-slate-400 group-focus-within:text-blue-600 transition-colors">
+                    <i data-lucide="lock-keyhole" class="w-5 h-5"></i>
+                </div>
+                <input type="password" id="pw" placeholder="Password" 
+                    class="w-full pl-14 pr-14 py-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 font-bold text-slate-700 transition-all"
+                    onkeypress="if(event.key === 'Enter') handleLogin()">
+                
+                <button type="button" onclick="togglePassword()" class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600">
+                    <i id="toggleIcon" data-lucide="eye" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <button onclick="handleLogin()" 
+                class="w-full bg-blue-600 text-white py-4 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 active:scale-[0.97] transition-all shadow-lg shadow-blue-500/25 mt-2">
+                Masuk Ke Dashboard
+            </button>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-slate-100 text-center">
+            <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">&copy; 2026 PT Suzuki Indomobil Motor</p>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function togglePassword() {
+            const pw = document.getElementById('pw');
+            const icon = document.getElementById('toggleIcon');
+            const isPw = pw.type === 'password';
+            
+            pw.type = isPw ? 'text' : 'password';
+            icon.setAttribute('data-lucide', isPw ? 'eye-off' : 'eye');
+            lucide.createIcons();
+        }
+
+        function handleLogin() {
+            const user = document.getElementById('username').value.trim();
+            const pw = document.getElementById('pw').value;
+            
+            // Logic Login Sama Seperti Sebelumnya
+            if (user === 'admin' && pw === 'paint2w123') {
+                saveLogin('admin', 'dashboard.html');
+            } else if (user === 'user' && pw === 'paint2w123') {
+                saveLogin('user', 'datanearmiss.html');
+            } else {
+                alert('Akses Ditolak! Cek kembali Username & Password.');
+                document.getElementById('pw').value = '';
+            }
+        }
+
+        function saveLogin(role, target) {
+            localStorage.setItem('role', role);
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('username', document.getElementById('username').value);
+            window.location.replace(target);
+        }
+
+        window.addEventListener('load', () => {
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                const role = localStorage.getItem('role');
+                window.location.replace(role === 'admin' ? 'dashboard.html' : 'datanearmiss.html');
+            }
+        });
+    </script>
+</body>
+</html>
